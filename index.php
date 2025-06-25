@@ -32,7 +32,7 @@
 </head>
 <body>
 
-<!-- ✅ Navigation Bar -->
+<!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
     <a class="navbar-brand font-weight-bold" href="#">APAI</a>
@@ -46,7 +46,7 @@
         <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
         <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-        <!-- 🛠 Link Register/Log in yang buka modal -->
+        <!--  Link Register/Log in yang buka modal -->
         <li class="nav-item"><a class="nav-link" href="#" data-toggle="modal" data-target="#authModal">Register/Log in</a></li>
         <li class="nav-item">
           <a class="btn btn-outline-light ml-2" href="#">Book service</a>
@@ -56,7 +56,7 @@
   </div>
 </nav>
 
-<!-- ✅ Hero Section (gambar background) -->
+<!-- Hero Section (gambar background) -->
 <header class="hero d-flex align-items-center">
   <div class="container text-center">
     <h1 class="display-4">We Provide Fast Mobile Repair Service</h1>
@@ -64,7 +64,7 @@
   </div>
 </header>
 
-<!-- ✅ Modal (Register/Log in) -->
+<!-- Modal (Register/Log in) -->
 <div class="modal fade" id="authModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-3">
@@ -83,7 +83,7 @@
         </ul>
 
         <div class="tab-content">
-          <!-- ✅ Login Form -->
+          <!-- Login Form -->
           <div class="tab-pane fade show active" id="loginForm">
             <form id="login" method="POST">
               <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
@@ -92,7 +92,7 @@
             </form>
           </div>
 
-          <!-- ✅ Sign Up Form (lengkap) -->
+          <!-- Sign Up Form (lengkap) -->
           <div class="tab-pane fade" id="signupForm">
             <form id="signup" method="POST">
               <input type="text" name="fullname" class="form-control mb-2" placeholder="Full Name" required>
@@ -111,7 +111,7 @@
   </div>
 </div>
 
-<!-- ✅ Script -->
+<!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/script.js"></script>
