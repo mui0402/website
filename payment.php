@@ -1,4 +1,4 @@
-<?php include ('layout/header.php'); ?>
+<?php include ('layout/user-header.php'); ?>
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">

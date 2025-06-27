@@ -1,158 +1,122 @@
-<?php include ('layout/header.php'); ?>
-            <div id="layoutSidenav_content">
-                <main>
-                    <div class="container-fluid px-4">
-                        <h1 class="mt-4">Book Repair Service</h1>
-                        <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Book Service</li>
-                        </ol>
-                        
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <i class="fas fa-mobile-alt me-1"></i>
-                                        Device Repair Booking Form
-                                    </div>
-                                    <div class="card-body">
-                                        <form method="post" action="booking-confirmation.php">
-                                            <!-- Customer Information -->
-                                            <h5 class="mb-3 text-primary">Customer Information</h5>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="customerName" name="customer_name" placeholder="Full Name" required>
-                                                        <label for="customerName">Full Name</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="email" class="form-control" id="customerEmail" name="customer_email" placeholder="Email Address" required>
-                                                        <label for="customerEmail">Email Address</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="tel" class="form-control" id="customerPhone" name="customer_phone" placeholder="Phone Number" required>
-                                                        <label for="customerPhone">Phone Number</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="customerAddress" name="customer_address" placeholder="Address" required>
-                                                        <label for="customerAddress">Address</label>
-                                                    </div>
-                                                </div>
-                                            </div>
+<?php 
+// Include user header
+include ('layout/user-header.php'); 
+?>
 
-                                            <hr class="my-4">
-
-                                            <!-- Device Information -->
-                                            <h5 class="mb-3 text-primary">Device Information</h5>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <select class="form-select" id="deviceType" name="device_type" required>
-                                                            <option value="">Select Device Type</option>
-                                                            <option value="iPhone">iPhone</option>
-                                                            <option value="Samsung">Samsung</option>
-                                                            <option value="Huawei">Huawei</option>
-                                                            <option value="Xiaomi">Xiaomi</option>
-                                                            <option value="iPad">iPad</option>
-                                                            <option value="Tablet">Android Tablet</option>
-                                                            <option value="Other">Other</option>
-                                                        </select>
-                                                        <label for="deviceType">Device Type</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="deviceModel" name="device_model" placeholder="Device Model" required>
-                                                        <label for="deviceModel">Device Model (e.g., iPhone 13, Galaxy S21)</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="issueDescription" class="form-label">Issue Description</label>
-                                                <textarea class="form-control" id="issueDescription" name="issue_description" rows="4" placeholder="Please describe the problem with your device in detail..." required></textarea>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <select class="form-select" id="issueType" name="issue_type" required>
-                                                            <option value="">Select Issue Type</option>
-                                                            <option value="Screen Damage">Screen Damage</option>
-                                                            <option value="Battery Issues">Battery Issues</option>
-                                                            <option value="Water Damage">Water Damage</option>
-                                                            <option value="Charging Problems">Charging Problems</option>
-                                                            <option value="Audio Issues">Audio Issues</option>
-                                                            <option value="Camera Problems">Camera Problems</option>
-                                                            <option value="Software Issues">Software Issues</option>
-                                                            <option value="Other">Other</option>
-                                                        </select>
-                                                        <label for="issueType">Issue Type</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <select class="form-select" id="urgency" name="urgency" required>
-                                                            <option value="">Select Urgency</option>
-                                                            <option value="Low">Low - Within a week</option>
-                                                            <option value="Medium">Medium - Within 3 days</option>
-                                                            <option value="High">High - Within 24 hours</option>
-                                                            <option value="Emergency">Emergency - Same day</option>
-                                                        </select>
-                                                        <label for="urgency">Urgency Level</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-4">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="date" class="form-control" id="preferredDate" name="preferred_date" required>
-                                                        <label for="preferredDate">Preferred Intake Date</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <select class="form-select" id="preferredTime" name="preferred_time" required>
-                                                            <option value="">Select Time Slot</option>
-                                                            <option value="09:00-11:00">9:00 AM - 11:00 AM</option>
-                                                            <option value="11:00-13:00">11:00 AM - 1:00 PM</option>
-                                                            <option value="13:00-15:00">1:00 PM - 3:00 PM</option>
-                                                            <option value="15:00-17:00">3:00 PM - 5:00 PM</option>
-                                                            <option value="17:00-19:00">5:00 PM - 7:00 PM</option>
-                                                        </select>
-                                                        <label for="preferredTime">Preferred Time</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-check mb-4">
-                                                <input class="form-check-input" type="checkbox" id="termsAgreement" required>
-                                                <label class="form-check-label" for="termsAgreement">
-                                                    I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a> and understand that a diagnostic fee may apply.
-                                                </label>
-                                            </div>
-
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                                <a href="dashboard.php" class="btn btn-secondary me-md-2">Cancel</a>
-                                                <button type="submit" class="btn btn-primary">
-                                                    <i class="fas fa-paper-plane me-2"></i>Submit Booking
-                                                </button>
-                                            </div>
-                                        </form>
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid px-4">
+            
+            
+            <!-- Main Booking Form Section -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-primary text-white">
+                            <i class="fas fa-mobile-alt me-2"></i>
+                            Device Repair Booking Form
+                        </div>
+                        <div class="card-body p-5">
+                            <!-- Booking Form -->
+                            <form id="repairBookingForm">
+                                <!-- Personal Information Section -->
+                                <div class="mb-4">
+                                    <h5 class="text-primary mb-3"><i class="fas fa-user-circle me-2"></i>Personal Information</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="name" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="email" placeholder="example@gmail.com" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phone" placeholder="012-3456789" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="address" class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="address" placeholder="Your complete address" required>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                
+                                <!-- Device Information Section -->
+                                <div class="mb-4">
+                                    <h5 class="text-primary mb-3"><i class="fas fa-laptop me-2"></i>Device Information</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="device_type" class="form-label">Device Type</label>
+                                            <select class="form-select" id="device_type" required>
+                                                <option value="" selected disabled>Select device type</option>
+                                                <option value="Mobile">Android</option>
+                                                <option value="Tablet">Tablet</option>
+                                                <option value="Laptop">Iphone</option>
+                                                <option value="Desktop">Ipad</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="device_brand" class="form-label">Device Brand</label>
+                                            <select class="form-select" id="device_brand" required>
+                                                <option value="" selected disabled>Select brand</option>
+                                                <option value="Apple">Apple</option>
+                                                <option value="Samsung">Samsung</option>
+                                                <option value="Huawei">Huawei</option>
+                                                <option value="Xiaomi">Xiaomi</option>
+                                                <option value="Other">Other Brand</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="device_model" class="form-label">Device Model</label>
+                                            <input type="text" class="form-control" id="device_model" placeholder="e.g. iPhone 13, Galaxy S21" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="device_intake" class="form-label">Preferred Intake Date</label>
+                                            <input type="date" class="form-control" id="device_intake" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Repair Details Section -->
+                                <div class="mb-4">
+                                    <h5 class="text-primary mb-3"><i class="fas fa-tools me-2"></i>Repair Details</h5>
+                                    <div class="mb-3">
+                                        <label for="device_issue" class="form-label">Describe the Issue</label>
+                                        <textarea class="form-control" id="device_issue" rows="3" placeholder="Please describe the problem in detail..." required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Additional Services</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="data_backup">
+                                            <label class="form-check-label" for="data_backup">Port Cleaning Service-Full Cleaning (RM20)</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="screen_protector">
+                                            <label class="form-check-label" for="screen_protector">Screen Protector Installation (RM20)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Form Submission -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                    <button type="reset" class="btn btn-outline-secondary me-md-2">
+                                        <i class="fas fa-undo me-2"></i>Reset Form
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>Submit Booking
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </main>
+                </div>
             </div>
-<?php include ('layout/footer.php'); ?>
+        </div>
+    </main>
+</div>
+
+<?php 
+// Include footer
+include ('layout/footer.php'); 
+?>
