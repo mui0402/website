@@ -4,7 +4,7 @@
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">Dashboard</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active">Admin Dashboard - APAI Repair System Overview</li>
+                            <li class="breadcrumb-item active">Staff Dashboard - APAI Repair System Overview</li>
                         </ol>
                         <div class="row">
                             <div class="col-xl-3 col-md-6">
@@ -48,42 +48,6 @@
                                             <div>Monthly Revenue</div>
                                         </div>
                                         <i class="fas fa-chart-line fa-2x ms-auto"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Quick Actions -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <i class="fas fa-bolt me-1"></i>
-                                        Quick Actions
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row g-3">
-                                            <div class="col-md-3">
-                                                <a href="booking.php" class="btn btn-outline-primary w-100">
-                                                    <i class="fas fa-plus-circle me-2"></i>New Booking
-                                                </a>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <a href="customer-bookings.php" class="btn btn-outline-info w-100">
-                                                    <i class="fas fa-list me-2"></i>View Bookings
-                                                </a>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <a href="inventory.php" class="btn btn-outline-warning w-100">
-                                                    <i class="fas fa-boxes me-2"></i>Manage Stock
-                                                </a>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <a href="financial-tracking.php" class="btn btn-outline-success w-100">
-                                                    <i class="fas fa-chart-bar me-2"></i>Financial Report
-                                                </a>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -135,25 +99,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-exclamation-triangle me-1"></i>
-                                        Low Stock Alert
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="alert alert-warning" role="alert">
-                                            <strong>iPhone 13 Screens:</strong> Only 3 units left
-                                        </div>
-                                        <div class="alert alert-warning" role="alert">
-                                            <strong>Samsung Batteries:</strong> Only 5 units left
-                                        </div>
-                                        <div class="alert alert-info" role="alert">
-                                            <strong>Charging Ports:</strong> 8 units remaining
                                         </div>
                                     </div>
                                 </div>

@@ -1,4 +1,4 @@
-<?php include ('layout/header.php'); ?>
+<?php include ('layout/admin-header.php'); ?>
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
@@ -8,7 +8,7 @@
                             <li class="breadcrumb-item active">Item Stock</li>
                         </ol>
                         
-                        <div class="row">
+                        <div class="row">   
                             <div class="col-12">
                                 <div class="card mb-4">
                                     <div class="card-header d-flex justify-content-between align-items-center">
