@@ -2,11 +2,7 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Financial Tracking</h1>
-                        <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="admin-dashboard.php">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Financial Tracking</li>
-                        </ol>
+                        <h1 class="mt-4">Financial Tracking Dashboard</h1>
                         
                         <!-- Filter Controls -->
                         <div class="row mb-4">

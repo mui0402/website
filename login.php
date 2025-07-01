@@ -1,94 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Login - APAI Repair System</title>
-    <link href="css/styles.css" rel="stylesheet" />
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <style>
-        .login-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+<?php
+session_start();
+
+// DB connection
+$conn = new mysqli("localhost", "root", "", "website1");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get form data
+$email = trim($_POST['email']);
+$password = $_POST['password'];
+$user_role = $_POST['user_role'];
+
+// Choose table based on role
+if ($user_role === 'user') {
+    $stmt = $conn->prepare("SELECT * FROM customer WHERE email = ?");
+} elseif ($user_role === 'admin') {
+    $stmt = $conn->prepare("SELECT * FROM staff WHERE staff_email = ?");
+} else {
+    die("Invalid role selected.");
+}
+
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 1) {
+    $user = $result->fetch_assoc();
+
+    // Pick correct hashed password field
+    $hashed_password = ($user_role === 'user') ? $user['password'] : $user['staff_password'];
+
+    if (password_verify($password, $hashed_password)) {
+        // Set session
+        $_SESSION['email'] = $email;
+        $_SESSION['role'] = $user_role;
+
+        // ✅ Redirect based on role
+        if ($user_role === 'user') {
+            header("Location: dashboard.php"); // for customers
+        } else {
+            header("Location: financial-tracking.php"); // for staff/admin
         }
-        .login-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-</head>
-<body class="bg-primary">
-    <div id="layoutAuthentication">
-        <div id="layoutAuthentication_content">
-            <main>
-                <div class="container-fluid login-container">
-                    <div class="row justify-content-center align-items-center min-vh-100">
-                        <div class="col-lg-5">
-                            <div class="card login-card shadow-lg border-0">
-                                <div class="card-body p-5">
-                                    <div class="text-center mb-4">
-                                        <i class="fas fa-mobile-alt text-primary" style="font-size: 3rem;"></i>
-                                        <h3 class="fw-bold mt-3">Welcome Back</h3>
-                                        <p class="text-muted">Sign in to your APAI account</p>
-                                    </div>
-                                    <form action="process-login.php" method="post">
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" id="inputEmail" name="email" type="email" placeholder="name@example.com" required />
-                                            <label for="inputEmail">Email address</label>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Password" required />
-                                            <label for="inputPassword">Password</label>
-                                        </div>
-                                        
-                                        <!-- Role Selection -->
-                                        <div class="mb-3">
-                                            <label class="form-label fw-bold">Login as:</label>
-                                            <div class="d-flex gap-4">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="user_role" id="roleUser" value="user" checked>
-                                                    <label class="form-check-label" for="roleUser">
-                                                        <i class="fas fa-user me-2"></i>Customer
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="user_role" id="roleAdmin" value="admin">
-                                                    <label class="form-check-label" for="roleAdmin">
-                                                        <i class="fas fa-user-shield me-2"></i>Staff/Admin
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" id="inputRememberPassword" type="checkbox" />
-                                            <label class="form-check-label" for="inputRememberPassword">Remember Password</label>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                            <a class="small" href="password.php">Forgot Password?</a>
-                                            <button class="btn btn-primary" type="submit">Login</button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="card-footer text-center py-3">
-                                    <div class="small">
-                                        <a href="register.php">Need an account? Sign up!</a>
-                                    </div>
-                                    <div class="small mt-2">
-                                        <a href="index.php">← Back to Home</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        exit();
+    } else {
+        echo "<script>alert('❌ Incorrect password.'); window.history.back();</script>";
+    }
+} else {
+    echo "<script>alert('❌ Account not found.'); window.history.back();</script>";
+}
+
+$stmt->close();
+$conn->close();
+?>

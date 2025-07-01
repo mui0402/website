@@ -39,8 +39,8 @@
                 <i class="fas fa-mobile-alt me-2"></i>APAI Repair System
             </a>
             <div class="ms-auto">
-                <a href="login.php" class="btn btn-outline-primary me-2">Login</a>
-                <a href="register.php" class="btn btn-primary">Register</a>
+                <a href="login.html" class="btn btn-outline-primary me-2">Login</a>
+                <a href="register.html" class="btn btn-primary">Register</a>
             </div>
         </div>
     </nav>
@@ -53,8 +53,8 @@
                     <h1 class="display-4 fw-bold mb-4">Professional Mobile Device Repair Services</h1>
                     <p class="lead mb-4">Fast, reliable, and affordable repair solutions for all your mobile devices. Track your repair status in real-time and enjoy seamless service experience.</p>
                     <div class="d-flex gap-3">
-                        <a href="register.php" class="btn btn-light btn-lg">Book Repair Service</a>
-                        <a href="login.php" class="btn btn-outline-light btn-lg">Track My Device</a>
+                        <a href="register.html" class="btn btn-light btn-lg">Book Repair Service</a>
+                        <a href="login.html" class="btn btn-outline-light btn-lg">Track My Device</a>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">

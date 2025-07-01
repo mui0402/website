@@ -14,7 +14,7 @@
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand dengan Image sebagai Button -->
-            <a class="navbar-brand ps-3" href="admin-dashboard.php">
+            <a class="navbar-brand ps-3" href="financial-tracking.php">
                 <i class="fas fa-mobile-alt me-2"></i>
                 <img src="assets/img/apai.png" class="navbar-logo" style="height: 40px;">
             </a>
@@ -41,7 +41,11 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Staff Panel</div>
-                                <a class="nav-link" href="customer-bookings.php">
+                            <a class="nav-link" href="financial-tracking.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-bar"></i></div>
+                                Financial Trackings
+                            </a>
+                            <a class="nav-link" href="customer-bookings.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
                                 All Bookings
                             </a>
@@ -49,11 +53,6 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
                                 Inventory
                             </a>
-                            <a class="nav-link" href="financial-tracking.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-chart-bar"></i></div>
-                                Financial Reports
-                            </a>
-                            
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
