@@ -38,7 +38,7 @@ if ($result->num_rows === 1) {
 
         // ✅ Redirect based on role
         if ($user_role === 'user') {
-            header("Location: dashboard.php"); // for customers
+            header("Location: user-dashboard.php"); // for customers
         } else {
             header("Location: financial-tracking.php"); // for staff/admin
         }
