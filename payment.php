@@ -21,34 +21,7 @@
                                         <div class="row mb-4">
                                             <div class="col-12">
                                                 <div class="form-check border rounded p-3 mb-3">
-                                                    <input class="form-check-input" type="checkbox" value="APR001" id="booking1" checked>
-                                                    <label class="form-check-label w-100" for="booking1">
-                                                        <div class="d-flex justify-content-between">
-                                                            <div>
-                                                                <strong>iPhone 13 Screen Replacement</strong>
-                                                                <br><small class="text-muted">Booking ID: #APR001</small>
-                                                            </div>
-                                                            <div class="text-end">
-                                                                <strong>RM 450.00</strong>
-                                                                <br><span class="badge bg-warning">Pending Payment</span>
-                                                            </div>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check border rounded p-3 mb-3">
-                                                    <input class="form-check-input" type="checkbox" value="APR002" id="booking2">
-                                                    <label class="form-check-label w-100" for="booking2">
-                                                        <div class="d-flex justify-content-between">
-                                                            <div>
-                                                                <strong>Samsung Galaxy Battery Replacement</strong>
-                                                                <br><small class="text-muted">Booking ID: #APR002</small>
-                                                            </div>
-                                                            <div class="text-end">
-                                                                <strong>RM 280.00</strong>
-                                                                <br><span class="badge bg-warning">Pending Payment</span>
-                                                            </div>
-                                                        </div>
-                                                    </label>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
