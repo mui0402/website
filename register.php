@@ -28,8 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Passwords do not match.");
     }
 
-    // Hash the password
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    
 
     // OPTIONAL: check if email already exists
     $check_sql = "SELECT * FROM customer WHERE email = ?";
@@ -47,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES (?, ?, ?, ?, ?)";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssss", $first_name, $last_name, $email, $phone, $hashed_password);
+    $stmt->bind_param("sssss", $first_name, $last_name, $email, $phone, $password);
 
     if ($stmt->execute()) {
         echo "Registration successful! <a href='login.php'>Login here</a>";
