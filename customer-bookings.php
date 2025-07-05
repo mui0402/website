@@ -1,216 +1,368 @@
 <?php
 include('layout/admin-header.php');
-include('dbconnection.php'); // <-- Correct file for DB connection
+include('dbconnection.php');
 
 $result = mysqli_query($conn, "SELECT * FROM booking");
 ?>
 
-<main class="container py-4">
-    <h3 class="mb-4">Customer Bookings</h3>
-    <div class="accordion" id="bookingsAccordion">
-        <?php
-        $query = "SELECT * FROM booking ORDER BY booking_date DESC";
-        $result = mysqli_query($conn, $query);
-        $i = 1;
-
-        while ($row = mysqli_fetch_assoc($result)) {
-            $bookingId = $row['booking_id'];
-            $fullName = htmlspecialchars($row['full_name']);
-            $email = htmlspecialchars($row['email']);
-            $phone = htmlspecialchars($row['phone_number']);
-            $address = htmlspecialchars($row['address']);
-            $device = htmlspecialchars($row['device_brand'] . ' ' . $row['device_model']);
-            $issue = htmlspecialchars($row['issue_description']);
-            $urgency = htmlspecialchars($row['repair_type']);
-            $status = $row['status'];
-            $cost = number_format($row['repair_cost'], 2);
-            $date = date("M d, Y", strtotime($row['booking_date']));
-
-            $badgeClass = match ($status) {
-                'Pending' => 'bg-info',
-                'In Progress' => 'bg-warning',
-                'Completed' => 'bg-success',
-                'Cancelled' => 'bg-danger',
-                default => 'bg-secondary',
-            };
-
-            echo '
-            <div class="accordion-item mb-3">
-                <h2 class="accordion-header" id="booking' . $i . '">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' . $i . '">
-                        <div class="d-flex justify-content-between w-100 me-3">
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Customer Bookings</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item active">Customer Bookings</li>
+            </ol>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <div>
-                                <strong>' . $fullName . ' - ' . $device . '</strong>
-                                <br><small class="text-muted">Booking ID: #' . $bookingId . '</small>
+                                <i class="fas fa-list me-1"></i>
+                                All Customer Bookings
                             </div>
-                            <div class="text-end">
-                                <span class="badge ' . $badgeClass . '">' . $status . '</span>
-                                <br><small class="text-muted">' . $date . '</small>
+                            <a href="booking.php" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>New Booking
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <!-- Booking Items -->
+                            <div class="accordion" id="bookingsAccordion">
+                                <?php
+                                $query = "SELECT * FROM booking ORDER BY booking_date DESC";
+                                $result = mysqli_query($conn, $query);
+                                $i = 1;
+
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    $bookingId = $row['booking_id'];
+                                    $fullName = htmlspecialchars($row['full_name']);
+                                    $email = htmlspecialchars($row['email']);
+                                    $phone = htmlspecialchars($row['phone_number']);
+                                    $address = htmlspecialchars($row['address']);
+                                    $device = htmlspecialchars($row['device_brand'] . ' ' . $row['device_model']);
+                                    $issue = htmlspecialchars($row['issue_description']);
+                                    $urgency = htmlspecialchars($row['repair_type']);
+                                    $status = $row['status'];
+                                    $cost = number_format($row['repair_cost'], 2);
+                                    $date = date("M d, Y", strtotime($row['booking_date']));
+
+                                    $badgeClass = match ($status) {
+                                        'Pending' => 'bg-info',
+                                        'In Progress' => 'bg-warning',
+                                        'Completed' => 'bg-success',
+                                        'Cancelled' => 'bg-danger',
+                                        default => 'bg-secondary',
+                                    };
+                                ?>
+                                    <div class="accordion-item mb-3">
+                                        <h2 class="accordion-header" id="booking<?php echo $i; ?>">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $i; ?>">
+                                                <div class="d-flex justify-content-between w-100 me-3">
+                                                    <div>
+                                                        <strong><?php echo $fullName; ?> - <?php echo $device; ?></strong>
+                                                        <br><small class="text-muted">Booking ID: #<?php echo $bookingId; ?></small>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="badge <?php echo $badgeClass; ?>"><?php echo $status; ?></span>
+                                                        <br><small class="text-muted"><?php echo $date; ?></small>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </h2>
+                                        <div id="collapse<?php echo $i; ?>" class="accordion-collapse collapse" data-bs-parent="#bookingsAccordion">
+                                            <div class="accordion-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <h6>Customer Details:</h6>
+                                                        <p class="mb-1"><strong>Name:</strong> <?php echo $fullName; ?></p>
+                                                        <p class="mb-1"><strong>Email:</strong> <?php echo $email; ?></p>
+                                                        <p class="mb-1"><strong>Phone:</strong> <?php echo $phone; ?></p>
+                                                        <p class="mb-1"><strong>Address:</strong> <?php echo $address; ?></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h6>Device Details:</h6>
+                                                        <p class="mb-1"><strong>Device:</strong> <?php echo $device; ?></p>
+                                                        <p class="mb-1"><strong>Issue:</strong> <?php echo $issue; ?></p>
+                                                        <p class="mb-1"><strong>Urgency:</strong> <?php echo $urgency; ?></p>
+                                                        <p class="mb-1"><strong>Repair Cost:</strong> <span id="cost<?php echo $bookingId; ?>">RM <?php echo $cost; ?></span></p>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <form class="booking-update-form" data-booking-id="<?php echo $bookingId; ?>">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-6">
+                                                            <label for="status<?php echo $bookingId; ?>" class="form-label">Update Status:</label>
+                                                            <select class="form-select status-select" id="status<?php echo $bookingId; ?>" name="status" data-booking-id="<?php echo $bookingId; ?>">
+                                                                <option value="Pending"<?php echo ($status == 'Pending' ? ' selected' : ''); ?>>Pending</option>
+                                                                <option value="In Progress"<?php echo ($status == 'In Progress' ? ' selected' : ''); ?>>In Progress</option>
+                                                                <option value="Completed"<?php echo ($status == 'Completed' ? ' selected' : ''); ?>>Completed</option>
+                                                                <option value="Cancelled"<?php echo ($status == 'Cancelled' ? ' selected' : ''); ?>>Cancelled</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 text-end">
+                                                            <button type="submit" class="btn btn-sm btn-success me-2">Update</button>
+                                                            <button type="button" class="btn btn-sm btn-outline-info send-notification-btn" data-booking-id="<?php echo $bookingId; ?>" data-customer-email="<?php echo $email; ?>" data-customer-name="<?php echo $fullName; ?>" data-device="<?php echo $device; ?>" data-status="<?php echo $status; ?>">
+                                                                <i class="fas fa-bell me-1"></i>Send Notification
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php
+                                    $i++;
+                                }
+                                ?>
                             </div>
                         </div>
-                    </button>
-                </h2>
-                <div id="collapse' . $i . '" class="accordion-collapse collapse" data-bs-parent="#bookingsAccordion">
-                    <div class="accordion-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Customer Details:</h6>
-                                <p class="mb-1"><strong>Name:</strong> ' . $fullName . '</p>
-                                <p class="mb-1"><strong>Email:</strong> ' . $email . '</p>
-                                <p class="mb-1"><strong>Phone:</strong> ' . $phone . '</p>
-                                <p class="mb-1"><strong>Address:</strong> ' . $address . '</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Device Details:</h6>
-                                <p class="mb-1"><strong>Device:</strong> ' . $device . '</p>
-                                <p class="mb-1"><strong>Issue:</strong> ' . $issue . '</p>
-                                <p class="mb-1"><strong>Urgency:</strong> ' . $urgency . '</p>
-                                <p class="mb-1"><strong>Repair Cost:</strong> <span id="cost' . $bookingId . '">RM ' . $cost . '</span></p>
-                            </div>
-                        </div>
-                        <hr>
-                        <form class="booking-update-form" data-booking-id="' . $bookingId . '">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <label for="status' . $bookingId . '" class="form-label">Update Status:</label>
-                                    <select class="form-select form-select-sm status-select" id="status' . $bookingId . '" name="status"
-                                        style="width: auto; display: inline-block;" data-booking-id="' . $bookingId . '">
-                                        <option value="Pending"' . ($status == 'Pending' ? ' selected' : '') . '>Pending</option>
-                                        <option value="In Progress"' . ($status == 'In Progress' ? ' selected' : '') . '>In Progress</option>
-                                        <option value="Completed"' . ($status == 'Completed' ? ' selected' : '') . '>Completed</option>
-                                        <option value="Cancelled"' . ($status == 'Cancelled' ? ' selected' : '') . '>Cancelled</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <button type="submit" class="btn btn-sm btn-success me-2">Update</button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary">View Invoice</button>
-                                </div>
-                            </div>
-                        </form>
                     </div>
                 </div>
-            </div>';
-            $i++;
-        }
-        ?>
-    </div>
-</main>
-
-<!-- Price Input Modal -->
-<div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="priceModalLabel">Enter Repair Cost</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form id="priceForm">
-                    <div class="mb-3">
-                        <label for="repairCost" class="form-label">Repair Cost (RM)</label>
-                        <input type="number" class="form-control" id="repairCost" name="repairCost" step="0.01" min="0" placeholder="0.00" required>
-                    </div>
-                    <input type="hidden" id="modalBookingId" name="bookingId">
-                    <input type="hidden" id="modalStatus" name="status">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmUpdate">Update Status & Cost</button>
+        </div>
+    </main>
+    
+    <!-- Price Input Modal -->
+    <div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="priceModalLabel">Enter Repair Cost</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="priceForm">
+                        <div class="mb-3">
+                            <label for="repairCost" class="form-label">Repair Cost (RM)</label>
+                            <input type="number" class="form-control" id="repairCost" name="repairCost" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                        <input type="hidden" id="modalBookingId" name="bookingId">
+                        <input type="hidden" id="modalStatus" name="status">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmUpdate">Update Status & Cost</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.status-select').forEach(function(select) {
-        select.addEventListener('change', function() {
-            const bookingId = this.getAttribute('data-booking-id');
-            const newStatus = this.value;
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Send Status Notification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="notificationForm">
+                        <div class="mb-3">
+                            <label for="customerEmail" class="form-label">Customer Email</label>
+                            <input type="email" class="form-control" id="customerEmail" name="customerEmail" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notificationMessage" class="form-label">Notification Message</label>
+                            <textarea class="form-control" id="notificationMessage" name="notificationMessage" rows="4" placeholder="Enter your message to the customer..."></textarea>
+                        </div>
+                        <input type="hidden" id="notificationBookingId" name="bookingId">
+                        <input type="hidden" id="notificationCustomerName" name="customerName">
+                        <input type="hidden" id="notificationDevice" name="device">
+                        <input type="hidden" id="notificationStatus" name="status">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info" id="sendNotification">
+                        <i class="fas fa-paper-plane me-1"></i>Send Notification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            if (newStatus === 'Completed') {
-                document.getElementById('modalBookingId').value = bookingId;
-                document.getElementById('modalStatus').value = newStatus;
-                document.getElementById('repairCost').value = '';
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Status select change handler
+        document.querySelectorAll('.status-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                const bookingId = this.getAttribute('data-booking-id');
+                const newStatus = this.value;
 
-                const modal = new bootstrap.Modal(document.getElementById('priceModal'));
+                if (newStatus === 'Completed') {
+                    document.getElementById('modalBookingId').value = bookingId;
+                    document.getElementById('modalStatus').value = newStatus;
+                    document.getElementById('repairCost').value = '';
+
+                    const modal = new bootstrap.Modal(document.getElementById('priceModal'));
+                    modal.show();
+                }
+            });
+        });
+
+        // Booking update form handler
+        document.querySelectorAll('.booking-update-form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const bookingId = this.getAttribute('data-booking-id');
+                const status = this.querySelector('.status-select').value;
+
+                if (status !== 'Completed') {
+                    updateBookingStatus(bookingId, status, null);
+                }
+            });
+        });
+
+        // Price modal confirm button
+        document.getElementById('confirmUpdate').addEventListener('click', function() {
+            const bookingId = document.getElementById('modalBookingId').value;
+            const status = document.getElementById('modalStatus').value;
+            const cost = document.getElementById('repairCost').value;
+
+            if (cost && parseFloat(cost) >= 0) {
+                updateBookingStatus(bookingId, status, cost);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('priceModal'));
+                modal.hide();
+            } else {
+                alert('Please enter a valid repair cost.');
+            }
+        });
+
+        // Send notification button handler
+        document.querySelectorAll('.send-notification-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const bookingId = this.getAttribute('data-booking-id');
+                const customerEmail = this.getAttribute('data-customer-email');
+                const customerName = this.getAttribute('data-customer-name');
+                const device = this.getAttribute('data-device');
+                const status = this.getAttribute('data-status');
+
+                // Populate notification modal
+                document.getElementById('notificationBookingId').value = bookingId;
+                document.getElementById('customerEmail').value = customerEmail;
+                document.getElementById('notificationCustomerName').value = customerName;
+                document.getElementById('notificationDevice').value = device;
+                document.getElementById('notificationStatus').value = status;
+
+                // Generate default message
+                const defaultMessage = `Dear ${customerName},\n\nWe wanted to update you on the status of your device repair.\n\nDevice: ${device}\nBooking ID: #${bookingId}\nCurrent Status: ${status}\n\n${getStatusMessage(status)}\n\nIf you have any questions, please don't hesitate to contact us.\n\nBest regards,\nAPAI Repair Service Team`;
+                
+                document.getElementById('notificationMessage').value = defaultMessage;
+
+                const modal = new bootstrap.Modal(document.getElementById('notificationModal'));
                 modal.show();
-            }
+            });
         });
-    });
 
-    document.querySelectorAll('.booking-update-form').forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const bookingId = this.getAttribute('data-booking-id');
-            const status = this.querySelector('.status-select').value;
+        // Send notification confirm button
+        document.getElementById('sendNotification').addEventListener('click', function() {
+            const formData = new FormData();
+            formData.append('booking_id', document.getElementById('notificationBookingId').value);
+            formData.append('customer_email', document.getElementById('customerEmail').value);
+            formData.append('customer_name', document.getElementById('notificationCustomerName').value);
+            formData.append('device', document.getElementById('notificationDevice').value);
+            formData.append('status', document.getElementById('notificationStatus').value);
+            formData.append('message', document.getElementById('notificationMessage').value);
 
-            if (status !== 'Completed') {
-                updateBookingStatus(bookingId, status, null);
-            }
-        });
-    });
-
-    document.getElementById('confirmUpdate').addEventListener('click', function() {
-        const bookingId = document.getElementById('modalBookingId').value;
-        const status = document.getElementById('modalStatus').value;
-        const cost = document.getElementById('repairCost').value;
-
-        if (cost && parseFloat(cost) >= 0) {
-            updateBookingStatus(bookingId, status, cost);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('priceModal'));
+            // Here you would typically send to a PHP file that handles email sending
+            // For now, we'll just show a success message
+            alert('Notification sent successfully to customer!');
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('notificationModal'));
             modal.hide();
-        } else {
-            alert('Please enter a valid repair cost.');
-        }
-    });
-});
 
-function updateBookingStatus(bookingId, status, cost) {
-    const formData = new FormData();
-    formData.append('booking_id', bookingId);
-    formData.append('status', status);
-    if (cost !== null) {
-        formData.append('repair_cost', cost);
+            // In a real implementation, you would do:
+            /*
+            fetch('send-notification.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Notification sent successfully!');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('notificationModal'));
+                    modal.hide();
+                } else {
+                    alert('Error sending notification: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the notification.');
+            });
+            */
+        });
+    });
+
+    function getStatusMessage(status) {
+        switch(status) {
+            case 'Pending':
+                return 'Your repair request has been received and is currently pending review. We will begin working on your device shortly.';
+            case 'In Progress':
+                return 'Great news! Our technicians have started working on your device. We will keep you updated on the progress.';
+            case 'Completed':
+                return 'Excellent! Your device repair has been completed successfully. You can now collect your device from our service center.';
+            case 'Cancelled':
+                return 'Unfortunately, your repair request has been cancelled. Please contact us if you have any questions about this decision.';
+            default:
+                return 'Thank you for choosing our repair service. We will keep you updated on any changes to your repair status.';
+        }
     }
 
-    fetch('update-booking-status.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const bookingElement = document.querySelector(`[data-booking-id="${bookingId}"]`).closest('.accordion-item');
-            const badge = bookingElement.querySelector('.badge');
-            badge.className = 'badge';
-
-            switch(status) {
-                case 'Pending': badge.classList.add('bg-info'); break;
-                case 'In Progress': badge.classList.add('bg-warning'); break;
-                case 'Completed': badge.classList.add('bg-success'); break;
-                case 'Cancelled': badge.classList.add('bg-danger'); break;
-            }
-            badge.textContent = status;
-
-            if (cost !== null) {
-                const costElement = document.getElementById(`cost${bookingId}`);
-                if (costElement) {
-                    costElement.textContent = `RM ${parseFloat(cost).toFixed(2)}`;
-                }
-            }
-
-            alert('Booking updated successfully!');
-        } else {
-            alert('Error updating booking: ' + data.message);
+    function updateBookingStatus(bookingId, status, cost) {
+        const formData = new FormData();
+        formData.append('booking_id', bookingId);
+        formData.append('status', status);
+        if (cost !== null) {
+            formData.append('repair_cost', cost);
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while updating the booking.');
-    });
-}
-</script>
+
+        fetch('update-booking-status.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const bookingElement = document.querySelector(`[data-booking-id="${bookingId}"]`).closest('.accordion-item');
+                const badge = bookingElement.querySelector('.badge');
+                badge.className = 'badge';
+
+                switch(status) {
+                    case 'Pending': badge.classList.add('bg-info'); break;
+                    case 'In Progress': badge.classList.add('bg-warning'); break;
+                    case 'Completed': badge.classList.add('bg-success'); break;
+                    case 'Cancelled': badge.classList.add('bg-danger'); break;
+                }
+                badge.textContent = status;
+
+                if (cost !== null) {
+                    const costElement = document.getElementById(`cost${bookingId}`);
+                    if (costElement) {
+                        costElement.textContent = `RM ${parseFloat(cost).toFixed(2)}`;
+                    }
+                }
+
+                // Update the notification button's data attributes
+                const notificationBtn = bookingElement.querySelector('.send-notification-btn');
+                if (notificationBtn) {
+                    notificationBtn.setAttribute('data-status', status);
+                }
+
+                alert('Booking updated successfully!');
+            } else {
+                alert('Error updating booking: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the booking.');
+        });
+    }
+    </script>
+</div>
 
 <?php include('layout/footer.php'); ?>
