@@ -14,7 +14,7 @@ include ('layout/user-header.php');
                         <p class="lead mb-4">Fast, reliable, and affordable repair solutions for all your mobile devices. Track your repair status in real-time and enjoy seamless service experience.</p>
                         <div class="d-flex gap-3">
                             <a href="booking.php" class="btn btn-light btn-lg">Book Repair Service</a>
-                            <a href="customer-bookings.php" class="btn btn-outline-light btn-lg">Track My Device</a>
+                            <a href="my-bookings.php" class="btn btn-outline-light btn-lg">Track My Device</a>
                         </div>
                     </div>
                     <div class="col-lg-6 text-center">

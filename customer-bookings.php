@@ -22,9 +22,6 @@ $result = mysqli_query($conn, "SELECT * FROM booking");
                                 <i class="fas fa-list me-1"></i>
                                 All Customer Bookings
                             </div>
-                            <a href="booking.php" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-1"></i>New Booking
-                            </a>
                         </div>
                         <div class="card-body">
                             <!-- Booking Items -->
