@@ -1,27 +1,19 @@
 <?php
 include('layout/user-header.php');
-
-// Database connection (without config/db.php)
-$conn = new mysqli("localhost", "root", "", "website1");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include('dbconnection.php');
 
 // Get logged-in user's email
 session_start();
 $email = $_SESSION['user_email'] ?? '';
 
-// Get customer ID
-$customerQuery = $conn->prepare("SELECT customer_id FROM customer WHERE email = ?");
-$customerQuery->bind_param("s", $email);
-$customerQuery->execute();
-$customerResult = $customerQuery->get_result();
-$customer = $customerResult->fetch_assoc();
-$customer_id = $customer['customer_id'] ?? 0;
+if (empty($email)) {
+    header("Location: login.php");
+    exit();
+}
 
-// Fetch all bookings for this customer
-$stmt = $conn->prepare("SELECT * FROM booking WHERE customer_id = ?");
-$stmt->bind_param("i", $customer_id);
+// Fetch all bookings for this customer using email
+$stmt = $conn->prepare("SELECT * FROM booking WHERE email = ? ORDER BY booking_date DESC");
+$stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -41,29 +33,28 @@ $today = date('Y-m-d');
                 <div class="accordion" id="bookingAccordion">
                     <?php $count = 1; while ($row = $result->fetch_assoc()): ?>
                         <?php
-                            // Status logic
-                            if ($row['status'] === 'Completed') {
-                                $status = 'Completed';
-                                $badge = 'success';
-                            } elseif ($today >= $row['preferred_date']) {
-                                $status = 'Processing';
-                                $badge = 'warning';
-                            } else {
-                                $status = 'Pending';
-                                $badge = 'info';
-                            }
+                            // Use the actual status from database instead of calculating
+                            $status = $row['status'];
+                            $badge = match ($status) {
+                                'Pending' => 'info',
+                                'In Progress' => 'warning', 
+                                'Completed' => 'success',
+                                'Cancelled' => 'danger',
+                                'Paid' => 'primary',
+                                default => 'secondary',
+                            };
                         ?>
                         <div class="accordion-item mb-3">
                             <h2 class="accordion-header" id="heading<?= $count ?>">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $count ?>" aria-expanded="false" aria-controls="collapse<?= $count ?>">
                                     <div class="d-flex justify-content-between w-100 me-3">
                                         <div>
-                                            <strong><?= htmlspecialchars($row['device_model']) ?> - <?= htmlspecialchars($row['issue_description']) ?></strong>
+                                            <strong><?= htmlspecialchars($row['device_brand']) ?> <?= htmlspecialchars($row['device_model']) ?> - <?= htmlspecialchars($row['issue_description']) ?></strong>
                                             <small class="text-muted d-block">Booking ID: #<?= $row['booking_id'] ?></small>
                                         </div>
                                         <div class="text-end">
                                             <span class="badge bg-<?= $badge ?>"><?= $status ?></span>
-                                            <small class="text-muted d-block"><?= date("M j, Y", strtotime($row['preferred_date'])) ?></small>
+                                            <small class="text-muted d-block"><?= date("M j, Y", strtotime($row['booking_date'])) ?></small>
                                         </div>
                                     </div>
                                 </button>
@@ -76,11 +67,19 @@ $today = date('Y-m-d');
                                             <p><strong>Device:</strong> <?= htmlspecialchars($row['device_brand']) ?><br>
                                             <strong>Model:</strong> <?= htmlspecialchars($row['device_model']) ?><br>
                                             <strong>Issue:</strong> <?= htmlspecialchars($row['issue_description']) ?><br>
-                                            <strong>Intake Date:</strong> <?= htmlspecialchars($row['preferred_date']) ?></p>
+                                            <strong>Repair Type:</strong> <?= htmlspecialchars($row['repair_type']) ?><br>
+                                            <strong>Booking Date:</strong> <?= date("M j, Y", strtotime($row['booking_date'])) ?></p>
                                         </div>
                                         <div class="col-md-6">
-                                            <h6>Status Info</h6>
-                                            <p><strong>Current Status:</strong> <span class="badge bg-<?= $badge ?>"><?= $status ?></span></p>
+                                            <h6>Status & Cost Info</h6>
+                                            <p><strong>Current Status:</strong> <span class="badge bg-<?= $badge ?>"><?= $status ?></span><br>
+                                            <strong>Repair Cost:</strong> 
+                                            <?php if ($row['repair_cost'] > 0): ?>
+                                                RM <?= number_format($row['repair_cost'], 2) ?>
+                                            <?php else: ?>
+                                                <span class="text-muted">To be determined</span>
+                                            <?php endif; ?>
+                                            </p>
 
                                             <h6 class="mt-3">Additional Services</h6>
                                             <ul class="mb-0">
@@ -96,19 +95,28 @@ $today = date('Y-m-d');
                                             </ul>
                                         </div>
                                     </div>
+                                    
+                                    <?php if ($status === 'Completed' && $row['repair_cost'] > 0): ?>
+                                        <div class="mt-3">
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                Your repair is completed! Please proceed to payment to collect your device.
+                                            </div>
+                                            <a href="payment.php" class="btn btn-success">
+                                                <i class="fas fa-credit-card me-2"></i>Proceed to Payment
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+                                    
                                     <div class="mt-3">
                                         <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#staffContact<?= $count ?>" aria-expanded="false">Contact Staff</button>
                                         <div class="collapse mt-2" id="staffContact<?= $count ?>">
-                                            <?php
-                                                $staffResult = $conn->query("SELECT * FROM staff LIMIT 1");
-                                                if ($staff = $staffResult->fetch_assoc()):
-                                            ?>
-                                                <div class="card card-body">
-                                                    <strong>Name:</strong> <?= $staff['staff_name'] ?><br>
-                                                    <strong>Email:</strong> <?= $staff['staff_email'] ?><br>
-                                                    <strong>Phone:</strong> <?= $staff['staff_phone'] ?>
-                                                </div>
-                                            <?php endif; ?>
+                                            <div class="card card-body">
+                                                <strong>APAI Repair Service</strong><br>
+                                                <strong>Email:</strong> support@apairepair.com<br>
+                                                <strong>Phone:</strong> +60 12-345 6789<br>
+                                                <strong>Address:</strong> 123 Tech Street, Kuala Lumpur
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +125,11 @@ $today = date('Y-m-d');
                         <?php $count++; endwhile; ?>
                 </div>
             <?php else: ?>
-                <div class="alert alert-warning">No bookings found.</div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any repair bookings yet. 
+                    <a href="booking.php" class="alert-link">Book a repair service</a> to get started.
+                </div>
             <?php endif; ?>
         </div>
     </main>

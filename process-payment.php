@@ -26,25 +26,17 @@ $payment_method = $input['payment_method'] ?? 'online_banking';
 $booking_ids = array_map('intval', $bookings);
 $booking_ids_str = implode(',', $booking_ids);
 
-// Get customer ID from session
+// Get user email from session
 $user_email = $_SESSION['user_email'];
-$customer_query = "SELECT customer_id FROM customer WHERE email = '$user_email'";
-$customer_result = mysqli_query($conn, $customer_query);
 
-if (!$customer_result || mysqli_num_rows($customer_result) === 0) {
-    echo json_encode(['success' => false, 'message' => 'Customer not found']);
-    exit();
-}
-
-$customer_data = mysqli_fetch_assoc($customer_result);
-$customer_id = $customer_data['customer_id'];
-
-// Update booking status to 'Paid' for selected bookings
-$update_sql = "UPDATE booking SET status = 'Paid' WHERE booking_id IN ($booking_ids_str) AND customer_id = $customer_id";
-$update_result = mysqli_query($conn, $update_sql);
+// Update booking status to 'Paid' for selected bookings belonging to this user
+$update_sql = "UPDATE booking SET status = 'Paid' WHERE booking_id IN ($booking_ids_str) AND email = ?";
+$stmt = $conn->prepare($update_sql);
+$stmt->bind_param("s", $user_email);
+$update_result = $stmt->execute();
 
 if ($update_result) {
-    $affected_rows = mysqli_affected_rows($conn);
+    $affected_rows = $stmt->affected_rows;
     if ($affected_rows > 0) {
         echo json_encode([
             'success' => true, 
@@ -52,11 +44,12 @@ if ($update_result) {
             'updated_bookings' => $affected_rows
         ]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'No bookings were updated']);
+        echo json_encode(['success' => false, 'message' => 'No bookings were updated. Please check if the bookings belong to your account.']);
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($conn)]);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
 }
 
+$stmt->close();
 mysqli_close($conn);
 ?>

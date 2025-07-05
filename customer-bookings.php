@@ -2,7 +2,34 @@
 include('layout/admin-header.php');
 include('dbconnection.php');
 
-$result = mysqli_query($conn, "SELECT * FROM booking");
+// Get filter parameter
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : 'all';
+
+// Build query based on filter
+if ($statusFilter === 'all') {
+    $query = "SELECT * FROM booking ORDER BY booking_date DESC";
+} else {
+    $query = "SELECT * FROM booking WHERE status = '" . mysqli_real_escape_string($conn, $statusFilter) . "' ORDER BY booking_date DESC";
+}
+
+$result = mysqli_query($conn, $query);
+
+// Get counts for each status
+$statusCounts = [];
+$countQueries = [
+    'all' => "SELECT COUNT(*) as count FROM booking",
+    'Pending' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Pending'",
+    'In Progress' => "SELECT COUNT(*) as count FROM booking WHERE status = 'In Progress'",
+    'Completed' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Completed'",
+    'Cancelled' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Cancelled'",
+    'Paid' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Paid'"
+];
+
+foreach ($countQueries as $status => $countQuery) {
+    $countResult = mysqli_query($conn, $countQuery);
+    $countRow = mysqli_fetch_assoc($countResult);
+    $statusCounts[$status] = $countRow['count'];
+}
 ?>
 
 <div id="layoutSidenav_content">
@@ -14,23 +41,109 @@ $result = mysqli_query($conn, "SELECT * FROM booking");
                 <li class="breadcrumb-item active">Customer Bookings</li>
             </ol>
             
+            <!-- Filter Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-filter me-1"></i>
+                            Filter Bookings
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="btn-group" role="group" aria-label="Status Filter">
+                                        <a href="customer-bookings.php?status=all" 
+                                           class="btn <?php echo ($statusFilter === 'all') ? 'btn-primary' : 'btn-outline-primary'; ?>">
+                                            All Bookings
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['all']; ?></span>
+                                        </a>
+                                        <a href="customer-bookings.php?status=Pending" 
+                                           class="btn <?php echo ($statusFilter === 'Pending') ? 'btn-info' : 'btn-outline-info'; ?>">
+                                            Pending
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Pending']; ?></span>
+                                        </a>
+                                        <a href="customer-bookings.php?status=In Progress" 
+                                           class="btn <?php echo ($statusFilter === 'In Progress') ? 'btn-warning' : 'btn-outline-warning'; ?>">
+                                            In Progress
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['In Progress']; ?></span>
+                                        </a>
+                                        <a href="customer-bookings.php?status=Completed" 
+                                           class="btn <?php echo ($statusFilter === 'Completed') ? 'btn-success' : 'btn-outline-success'; ?>">
+                                            Completed
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Completed']; ?></span>
+                                        </a>
+                                        <a href="customer-bookings.php?status=Cancelled" 
+                                           class="btn <?php echo ($statusFilter === 'Cancelled') ? 'btn-danger' : 'btn-outline-danger'; ?>">
+                                            Cancelled
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Cancelled']; ?></span>
+                                        </a>
+                                        </a>
+                                        <a href="customer-bookings.php?status=Paid" 
+                                           class="btn <?php echo ($statusFilter === 'Paid') ? 'btn-secondary' : 'btn-outline-secondary'; ?>">
+                                            Paid
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Paid']; ?></span>
+                                        </a>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, or device...">
+                                        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <div>
                                 <i class="fas fa-list me-1"></i>
-                                All Customer Bookings
+                                <?php 
+                                if ($statusFilter === 'all') {
+                                    echo "All Customer Bookings";
+                                } else {
+                                    echo ucfirst($statusFilter) . " Bookings";
+                                }
+                                ?>
+                                <span class="badge bg-secondary ms-2"><?php echo mysqli_num_rows($result); ?> results</span>
                             </div>
+                            <?php if ($statusFilter !== 'all'): ?>
+                            <div>
+                                <a href="customer-bookings.php?status=all" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Clear Filter
+                                </a>
+                            </div>
+                            <?php endif; ?>
                         </div>
                         <div class="card-body">
+                            <?php if (mysqli_num_rows($result) === 0): ?>
+                                <div class="text-center py-5">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No bookings found</h5>
+                                    <p class="text-muted">
+                                        <?php 
+                                        if ($statusFilter === 'all') {
+                                            echo "There are no bookings in the system yet.";
+                                        } else {
+                                            echo "There are no bookings with status: " . htmlspecialchars($statusFilter);
+                                        }
+                                        ?>
+                                    </p>
+                                </div>
+                            <?php else: ?>
                             <!-- Booking Items -->
                             <div class="accordion" id="bookingsAccordion">
                                 <?php
-                                $query = "SELECT * FROM booking ORDER BY booking_date DESC";
-                                $result = mysqli_query($conn, $query);
                                 $i = 1;
-
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     $bookingId = $row['booking_id'];
                                     $fullName = htmlspecialchars($row['full_name']);
@@ -52,7 +165,10 @@ $result = mysqli_query($conn, "SELECT * FROM booking");
                                         default => 'bg-secondary',
                                     };
                                 ?>
-                                    <div class="accordion-item mb-3">
+                                    <div class="accordion-item mb-3 booking-item" 
+                                         data-name="<?php echo strtolower($fullName); ?>" 
+                                         data-email="<?php echo strtolower($email); ?>" 
+                                         data-device="<?php echo strtolower($device); ?>">
                                         <h2 class="accordion-header" id="booking<?php echo $i; ?>">
                                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $i; ?>">
                                                 <div class="d-flex justify-content-between w-100 me-3">
@@ -113,6 +229,7 @@ $result = mysqli_query($conn, "SELECT * FROM booking");
                                 }
                                 ?>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -182,6 +299,34 @@ $result = mysqli_query($conn, "SELECT * FROM booking");
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const bookingItems = document.querySelectorAll('.booking-item');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            bookingItems.forEach(function(item) {
+                const name = item.getAttribute('data-name');
+                const email = item.getAttribute('data-email');
+                const device = item.getAttribute('data-device');
+                
+                if (name.includes(searchTerm) || email.includes(searchTerm) || device.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        clearSearchBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            bookingItems.forEach(function(item) {
+                item.style.display = 'block';
+            });
+        });
+
         // Status select change handler
         document.querySelectorAll('.status-select').forEach(function(select) {
             select.addEventListener('change', function() {
@@ -350,6 +495,11 @@ $result = mysqli_query($conn, "SELECT * FROM booking");
                 }
 
                 alert('Booking updated successfully!');
+                
+                // Refresh page to update counts if status changed
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 alert('Error updating booking: ' + data.message);
             }

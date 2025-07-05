@@ -9,31 +9,20 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Get customer ID from session or database
-// Since your login system uses email, we need to get customer_id from the customer table
+// Get user email from session
 $user_email = $_SESSION['user_email'];
-$customer_query = "SELECT customer_id FROM customer WHERE email = '$user_email'";
-$customer_result = mysqli_query($conn, $customer_query);
 
-if ($customer_result && mysqli_num_rows($customer_result) > 0) {
-    $customer_data = mysqli_fetch_assoc($customer_result);
-    $customer_id = $customer_data['customer_id'];
-} else {
-    // If customer not found, redirect to login
-    header("Location: login.php");
-    exit();
+// Fetch completed but unpaid bookings for this customer using email
+$sql = "SELECT * FROM booking WHERE email = ? AND status = 'Completed' AND repair_cost > 0";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$bookings = [];
+while ($row = $result->fetch_assoc()) {
+    $bookings[] = $row;
 }
-
-// Fetch unpaid bookings for this customer
-$sql = "SELECT * FROM booking WHERE customer_id = $customer_id AND status != 'Paid'";
-$result = mysqli_query($conn, $sql);
-
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
-}
-
-$bookings = mysqli_fetch_all($result, MYSQLI_ASSOC);
-mysqli_free_result($result);
 ?>
 
 <div id="layoutSidenav_content">
@@ -59,7 +48,14 @@ mysqli_free_result($result);
                                 <div class="col-12">
                                     <?php if(empty($bookings)): ?>
                                         <div class="alert alert-info">
-                                            You don't have any pending bookings to pay for.
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            You don't have any completed repairs ready for payment.
+                                            <br><small class="text-muted">Completed repairs with determined costs will appear here.</small>
+                                        </div>
+                                        <div class="text-center mt-4">
+                                            <a href="my-bookings.php" class="btn btn-primary">
+                                                <i class="fas fa-list me-2"></i>View My Bookings
+                                            </a>
                                         </div>
                                     <?php else: ?>
                                         <div class="table-responsive">
@@ -69,34 +65,46 @@ mysqli_free_result($result);
                                                         <th>Select</th>
                                                         <th>Booking ID</th>
                                                         <th>Device</th>
+                                                        <th>Issue</th>
                                                         <th>Services</th>
-                                                        <th>Amount</th>
+                                                        <th>Repair Cost</th>
+                                                        <th>Additional Services</th>
+                                                        <th>Total Amount</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach($bookings as $booking): 
                                                         $services = [];
-                                                        if($booking['service_cleaning']) $services[] = "Port Cleaning";
-                                                        if($booking['service_screen_protector']) $services[] = "Screen Protector";
+                                                        $additional_cost = 0;
                                                         
-                                                        // Calculate amount based on services
-                                                        $amount = 50; // Base repair cost
-                                                        if($booking['service_cleaning']) $amount += 20;
-                                                        if($booking['service_screen_protector']) $amount += 20;
+                                                        if($booking['service_cleaning']) {
+                                                            $services[] = "Port Cleaning";
+                                                            $additional_cost += 20;
+                                                        }
+                                                        if($booking['service_screen_protector']) {
+                                                            $services[] = "Screen Protector";
+                                                            $additional_cost += 20;
+                                                        }
+                                                        
+                                                        $repair_cost = floatval($booking['repair_cost']);
+                                                        $total_amount = $repair_cost + $additional_cost;
                                                     ?>
                                                     <tr>
                                                         <td>
                                                             <input type="checkbox" class="form-check-input booking-checkbox" 
                                                                    value="<?php echo $booking['booking_id']; ?>" 
-                                                                   data-amount="<?php echo $amount; ?>">
+                                                                   data-amount="<?php echo $total_amount; ?>">
                                                         </td>
                                                         <td>BK<?php echo str_pad($booking['booking_id'], 4, '0', STR_PAD_LEFT); ?></td>
                                                         <td>
                                                             <?php echo htmlspecialchars($booking['device_brand']) . ' ' . 
                                                                   htmlspecialchars($booking['device_model']); ?>
                                                         </td>
-                                                        <td><?php echo empty($services) ? 'Basic Repair' : implode(', ', $services); ?></td>
-                                                        <td>RM <?php echo number_format($amount, 2); ?></td>
+                                                        <td><?php echo htmlspecialchars($booking['issue_description']); ?></td>
+                                                        <td><?php echo empty($services) ? 'None' : implode(', ', $services); ?></td>
+                                                        <td>RM <?php echo number_format($repair_cost, 2); ?></td>
+                                                        <td>RM <?php echo number_format($additional_cost, 2); ?></td>
+                                                        <td><strong>RM <?php echo number_format($total_amount, 2); ?></strong></td>
                                                     </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
