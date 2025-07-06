@@ -1,17 +1,46 @@
 <?php
 include('layout/user-header.php');
 include('dbconnection.php');
-
 session_start();
-$email = $_SESSION['user_email'] ?? '';
 
+// Get user email
+$email = $_SESSION['user_email'] ?? '';
 if (empty($email)) {
     header("Location: login.php");
     exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM booking WHERE email = ? ORDER BY booking_date DESC");
-$stmt->bind_param("s", $email);
+// Get selected status filter from URL
+$statusFilter = $_GET['status'] ?? 'all';
+
+// Count bookings per status
+$statusCounts = [
+    'all' => 0,
+    'Pending' => 0,
+    'In Progress' => 0,
+    'Completed' => 0,
+    'Cancelled' => 0,
+    'Paid' => 0,
+];
+
+$countQuery = $conn->prepare("SELECT status, COUNT(*) as count FROM booking WHERE email = ? GROUP BY status");
+$countQuery->bind_param("s", $email);
+$countQuery->execute();
+$countResult = $countQuery->get_result();
+
+while ($row = $countResult->fetch_assoc()) {
+    $statusCounts[$row['status']] = $row['count'];
+}
+$statusCounts['all'] = array_sum($statusCounts);
+
+// Query bookings based on filter
+if ($statusFilter === 'all') {
+    $stmt = $conn->prepare("SELECT * FROM booking WHERE email = ? ORDER BY booking_date DESC");
+    $stmt->bind_param("s", $email);
+} else {
+    $stmt = $conn->prepare("SELECT * FROM booking WHERE email = ? AND status = ? ORDER BY booking_date DESC");
+    $stmt->bind_param("ss", $email, $statusFilter);
+}
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -27,6 +56,43 @@ $today = date('Y-m-d');
                 <li class="breadcrumb-item"><a href="user-dashboard.php">Dashboard</a></li>
                 <li class="breadcrumb-item active">My Repairs</li>
             </ol>
+
+            <!-- Filter Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-filter me-1"></i>
+                            Filter Bookings
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="btn-group" role="group" aria-label="Status Filter">
+                                        <?php
+                                        $statuses = ['all', 'Pending', 'In Progress', 'Completed', 'Cancelled', 'Paid'];
+                                        $colors = [
+                                            'all' => 'primary',
+                                            'Pending' => 'info',
+                                            'In Progress' => 'warning',
+                                            'Completed' => 'success',
+                                            'Cancelled' => 'danger',
+                                            'Paid' => 'secondary'
+                                        ];
+                                        foreach ($statuses as $status) {
+                                            $isActive = ($statusFilter === $status) ? "btn-{$colors[$status]}" : "btn-outline-{$colors[$status]}";
+                                            echo "<a href='my-bookings.php?status=" . urlencode($status) . "' class='btn $isActive'>";
+                                            echo ucfirst($status) . " <span class='badge bg-light text-dark ms-1'>{$statusCounts[$status]}</span></a>";
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Filter -->
 
             <?php if ($result->num_rows > 0): ?>
                 <div class="accordion" id="bookingAccordion">
@@ -126,10 +192,9 @@ $today = date('Y-m-d');
                         <?php $count++; endwhile; ?>
                 </div>
             <?php else: ?>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    You don't have any repair bookings yet. 
-                    <a href="booking.php" class="alert-link">Book a repair service</a> to get started.
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    No bookings found for the selected status. Please try a different filter.
                 </div>
             <?php endif; ?>
         </div>
