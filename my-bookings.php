@@ -2,7 +2,6 @@
 include('layout/user-header.php');
 include('dbconnection.php');
 
-// Get logged-in user's email
 session_start();
 $email = $_SESSION['user_email'] ?? '';
 
@@ -11,7 +10,6 @@ if (empty($email)) {
     exit();
 }
 
-// Fetch all bookings for this customer using email
 $stmt = $conn->prepare("SELECT * FROM booking WHERE email = ? ORDER BY booking_date DESC");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -20,6 +18,7 @@ $result = $stmt->get_result();
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $today = date('Y-m-d');
 ?>
+
 <div id="layoutSidenav_content">
     <main>
         <div class="container-fluid px-4">
@@ -33,11 +32,10 @@ $today = date('Y-m-d');
                 <div class="accordion" id="bookingAccordion">
                     <?php $count = 1; while ($row = $result->fetch_assoc()): ?>
                         <?php
-                            // Use the actual status from database instead of calculating
-                            $status = $row['status'];
+                            $status = $row['status'] ?? 'Unknown';
                             $badge = match ($status) {
                                 'Pending' => 'info',
-                                'In Progress' => 'warning', 
+                                'In Progress' => 'warning',
                                 'Completed' => 'success',
                                 'Cancelled' => 'danger',
                                 'Paid' => 'primary',
@@ -49,12 +47,12 @@ $today = date('Y-m-d');
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $count ?>" aria-expanded="false" aria-controls="collapse<?= $count ?>">
                                     <div class="d-flex justify-content-between w-100 me-3">
                                         <div>
-                                            <strong><?= htmlspecialchars($row['device_brand']) ?> <?= htmlspecialchars($row['device_model']) ?> - <?= htmlspecialchars($row['issue_description']) ?></strong>
-                                            <small class="text-muted d-block">Booking ID: #<?= $row['booking_id'] ?></small>
+                                            <strong><?= htmlspecialchars($row['device_brand'] ?? 'Unknown') ?> <?= htmlspecialchars($row['device_model'] ?? '') ?> - <?= htmlspecialchars($row['issue_description'] ?? '') ?></strong>
+                                            <small class="text-muted d-block">Booking ID: #<?= htmlspecialchars($row['booking_id']) ?></small>
                                         </div>
                                         <div class="text-end">
-                                            <span class="badge bg-<?= $badge ?>"><?= $status ?></span>
-                                            <small class="text-muted d-block"><?= date("M j, Y", strtotime($row['booking_date'])) ?></small>
+                                            <span class="badge bg-<?= $badge ?>"><?= htmlspecialchars($status) ?></span>
+                                            <small class="text-muted d-block"><?= date("M j, Y", strtotime($row['booking_date'] ?? $today)) ?></small>
                                         </div>
                                     </div>
                                 </button>
@@ -64,39 +62,42 @@ $today = date('Y-m-d');
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h6>Device Information</h6>
-                                            <p><strong>Device:</strong> <?= htmlspecialchars($row['device_brand']) ?><br>
-                                            <strong>Model:</strong> <?= htmlspecialchars($row['device_model']) ?><br>
-                                            <strong>Issue:</strong> <?= htmlspecialchars($row['issue_description']) ?><br>
-                                            <strong>Repair Type:</strong> <?= htmlspecialchars($row['repair_type']) ?><br>
-                                            <strong>Booking Date:</strong> <?= date("M j, Y", strtotime($row['booking_date'])) ?></p>
+                                            <p>
+                                                <strong>Device:</strong> <?= htmlspecialchars($row['device_brand'] ?? 'N/A') ?><br>
+                                                <strong>Model:</strong> <?= htmlspecialchars($row['device_model'] ?? 'N/A') ?><br>
+                                                <strong>Issue:</strong> <?= htmlspecialchars($row['issue_description'] ?? 'N/A') ?><br>
+                                                <strong>Repair Type:</strong> <?= htmlspecialchars($row['repair_type'] ?? 'General Repair') ?><br>
+                                                <strong>Booking Date:</strong> <?= date("M j, Y", strtotime($row['booking_date'] ?? $today)) ?>
+                                            </p>
                                         </div>
                                         <div class="col-md-6">
                                             <h6>Status & Cost Info</h6>
-                                            <p><strong>Current Status:</strong> <span class="badge bg-<?= $badge ?>"><?= $status ?></span><br>
-                                            <strong>Repair Cost:</strong> 
-                                            <?php if ($row['repair_cost'] > 0): ?>
-                                                RM <?= number_format($row['repair_cost'], 2) ?>
-                                            <?php else: ?>
-                                                <span class="text-muted">To be determined</span>
-                                            <?php endif; ?>
+                                            <p>
+                                                <strong>Current Status:</strong> <span class="badge bg-<?= $badge ?>"><?= htmlspecialchars($status) ?></span><br>
+                                                <strong>Repair Cost:</strong>
+                                                <?php if (!empty($row['repair_cost']) && $row['repair_cost'] > 0): ?>
+                                                    RM <?= number_format($row['repair_cost'], 2) ?>
+                                                <?php else: ?>
+                                                    <span class="text-muted">To be determined</span>
+                                                <?php endif; ?>
                                             </p>
 
                                             <h6 class="mt-3">Additional Services</h6>
                                             <ul class="mb-0">
-                                                <?php if ($row['service_cleaning']): ?>
+                                                <?php if (!empty($row['service_cleaning'])): ?>
                                                     <li>✅ Port Cleaning Service (RM20)</li>
                                                 <?php endif; ?>
-                                                <?php if ($row['service_screen_protector']): ?>
+                                                <?php if (!empty($row['service_screen_protector'])): ?>
                                                     <li>✅ Screen Protector Installation (RM20)</li>
                                                 <?php endif; ?>
-                                                <?php if (!$row['service_cleaning'] && !$row['service_screen_protector']): ?>
+                                                <?php if (empty($row['service_cleaning']) && empty($row['service_screen_protector'])): ?>
                                                     <li>No additional services selected.</li>
                                                 <?php endif; ?>
                                             </ul>
                                         </div>
                                     </div>
-                                    
-                                    <?php if ($status === 'Completed' && $row['repair_cost'] > 0): ?>
+
+                                    <?php if ($status === 'Completed' && !empty($row['repair_cost']) && $row['repair_cost'] > 0): ?>
                                         <div class="mt-3">
                                             <div class="alert alert-success">
                                                 <i class="fas fa-check-circle me-2"></i>
@@ -107,7 +108,7 @@ $today = date('Y-m-d');
                                             </a>
                                         </div>
                                     <?php endif; ?>
-                                    
+
                                     <div class="mt-3">
                                         <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#staffContact<?= $count ?>" aria-expanded="false">Contact Staff</button>
                                         <div class="collapse mt-2" id="staffContact<?= $count ?>">
@@ -134,4 +135,5 @@ $today = date('Y-m-d');
         </div>
     </main>
 </div>
+
 <?php include('layout/footer.php'); ?>
