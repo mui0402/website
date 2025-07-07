@@ -37,19 +37,39 @@ $update_result = $stmt->execute();
 
 if ($update_result) {
     $affected_rows = $stmt->affected_rows;
-    if ($affected_rows > 0) {
-        echo json_encode([
-            'success' => true, 
-            'message' => "Payment successful for $affected_rows booking(s)",
-            'updated_bookings' => $affected_rows
-        ]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'No bookings were updated. Please check if the bookings belong to your account.']);
+
+    // Now fetch booking info to insert into transactions
+    $fetch_sql = "SELECT booking_id, repair_cost, service_cleaning, service_screen_protector, device_brand, device_model FROM booking WHERE booking_id IN ($booking_ids_str)";
+    $result = $conn->query($fetch_sql);
+
+    while ($row = $result->fetch_assoc()) {
+        $booking_id = $row['booking_id'];
+        $base_cost = floatval($row['repair_cost']);
+        $additional = 0;
+
+        if ($row['service_cleaning']) $additional += 20;
+        if ($row['service_screen_protector']) $additional += 20;
+
+        $total_amount = $base_cost + $additional;
+        $device = $row['device_brand'] . ' ' . $row['device_model'];
+        $description = "$device - Repair Payment";
+
+        // Insert into transactions
+        $insert_sql = "INSERT INTO transactions (booking_id, user_email, amount, payment_method, description, type, status)
+                       VALUES (?, ?, ?, ?, ?, 'income', 'Completed')";
+        $insert_stmt = $conn->prepare($insert_sql);
+        $insert_stmt->bind_param("isdss", $booking_id, $user_email, $total_amount, $payment_method, $description);
+        $insert_stmt->execute();
     }
+
+    echo json_encode([
+        'success' => true,
+        'message' => "Payment successful and transactions recorded.",
+        'updated_bookings' => $affected_rows
+    ]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
 }
 
 $stmt->close();
 mysqli_close($conn);
-?>
