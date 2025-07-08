@@ -36,10 +36,6 @@ foreach ($countQueries as $status => $countQuery) {
     <main>
         <div class="container-fluid px-4">
             <h1 class="mt-4">Customer Bookings</h1>
-            <ol class="breadcrumb mb-4">
-                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">Customer Bookings</li>
-            </ol>
             
             <!-- Filter Section -->
             <div class="row mb-4">

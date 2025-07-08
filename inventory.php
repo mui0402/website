@@ -105,10 +105,6 @@ $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main>
     <div class="container-fluid px-4">
         <h1 class="mt-4">Item Stock Management</h1>
-        <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-            <li class="breadcrumb-item active">Item Stock</li>
-        </ol>
         
         <div class="row">   
             <div class="col-12">
