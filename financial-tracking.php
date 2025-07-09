@@ -128,7 +128,9 @@ $transactions->data_seek(0);
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span><i class="fas fa-history me-1"></i> Financial History - <?= date("F Y", strtotime($selectedMonth)) ?></span>
-            <a href="add-expense.php" class="btn btn-warning btn-sm"><i class="fas fa-plus me-1"></i> Add Expense</a>
+            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                <i class="fas fa-plus me-1"></i> Add Expense
+            </button>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -169,13 +171,48 @@ $transactions->data_seek(0);
 </main>
 </div>
 
+<!-- Add Expense Modal -->
+<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="add-expense.php">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addExpenseModalLabel">Add Expense</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <input type="text" class="form-control" name="description" required>
+          </div>
+          <div class="mb-3">
+            <label for="amount" class="form-label">Amount (RM)</label>
+            <input type="number" class="form-control" name="amount" step="0.01" required>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" name="status" required>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add Expense</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Scripts -->
 <script>
 function exportReport() {
     const month = document.getElementById('monthFilter').value;
     alert(`Financial report for ${month} exported successfully!`);
 }
 
-// Initialize DataTable
 document.addEventListener('DOMContentLoaded', function () {
     $('#financialTable').DataTable({
         "order": [[0, "desc"]]
@@ -183,7 +220,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<!-- DataTables scripts -->
+<!-- Bootstrap & DataTables Scripts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
