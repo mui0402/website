@@ -22,7 +22,9 @@ $countQueries = [
     'In Progress' => "SELECT COUNT(*) as count FROM booking WHERE status = 'In Progress'",
     'Completed' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Completed'",
     'Cancelled' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Cancelled'",
-    'Paid' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Paid'"
+    'Paid' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Paid'",
+    'Approved' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Approved'",
+    'Rejected' => "SELECT COUNT(*) as count FROM booking WHERE status = 'Rejected'"
 ];
 
 foreach ($countQueries as $status => $countQuery) {
@@ -79,6 +81,16 @@ foreach ($countQueries as $status => $countQuery) {
                                            class="btn <?php echo ($statusFilter === 'Paid') ? 'btn-secondary' : 'btn-outline-secondary'; ?>">
                                             Paid
                                             <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Paid']; ?></span>
+                                        </a>
+                                        <a href="customer-bookings.php?status=Approved" 
+                                           class="btn <?php echo ($statusFilter === 'Approved') ? 'btn-success' : 'btn-outline-success'; ?>">
+                                            Approved
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Approved']; ?></span>
+                                        </a>
+                                        <a href="customer-bookings.php?status=Rejected" 
+                                           class="btn <?php echo ($statusFilter === 'Rejected') ? 'btn-danger' : 'btn-outline-danger'; ?>">
+                                            Rejected
+                                            <span class="badge bg-light text-dark ms-1"><?php echo $statusCounts['Rejected']; ?></span>
                                         </a>
 
                                     </div>
@@ -158,6 +170,9 @@ foreach ($countQueries as $status => $countQuery) {
                                         'In Progress' => 'bg-warning',
                                         'Completed' => 'bg-success',
                                         'Cancelled' => 'bg-danger',
+                                        'Approved' => 'bg-success',
+                                        'Rejected' => 'bg-danger',
+                                        'Paid' => 'bg-secondary',
                                         default => 'bg-secondary',
                                     };
                                 ?>
@@ -207,6 +222,8 @@ foreach ($countQueries as $status => $countQuery) {
                                                                 <option value="In Progress"<?php echo ($status == 'In Progress' ? ' selected' : ''); ?>>In Progress</option>
                                                                 <option value="Completed"<?php echo ($status == 'Completed' ? ' selected' : ''); ?>>Completed</option>
                                                                 <option value="Cancelled"<?php echo ($status == 'Cancelled' ? ' selected' : ''); ?>>Cancelled</option>
+                                                                <option value="Approved"<?php echo ($status == 'Approved' ? ' selected' : ''); ?>>Approved</option>
+                                                                <option value="Rejected"<?php echo ($status == 'Rejected' ? ' selected' : ''); ?>>Rejected</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-6 text-end">
@@ -445,6 +462,10 @@ foreach ($countQueries as $status => $countQuery) {
                 return 'Excellent! Your device repair has been completed successfully. You can now collect your device from our service center.';
             case 'Cancelled':
                 return 'Unfortunately, your repair request has been cancelled. Please contact us if you have any questions about this decision.';
+            case 'Approved':
+                return 'Good news! Your repair request has been approved. We will begin working on your device soon.';
+            case 'Rejected':
+                return 'We regret to inform you that your repair request has been rejected. Please contact us for more information about this decision.';
             default:
                 return 'Thank you for choosing our repair service. We will keep you updated on any changes to your repair status.';
         }
@@ -474,6 +495,8 @@ foreach ($countQueries as $status => $countQuery) {
                     case 'In Progress': badge.classList.add('bg-warning'); break;
                     case 'Completed': badge.classList.add('bg-success'); break;
                     case 'Cancelled': badge.classList.add('bg-danger'); break;
+                    case 'Approved': badge.classList.add('bg-success'); break;
+                    case 'Rejected': badge.classList.add('bg-danger'); break;
                 }
                 badge.textContent = status;
 
