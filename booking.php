@@ -6,9 +6,15 @@ include ('layout/user-header.php');
 <div id="layoutSidenav_content">
     <main>
         <div class="container-fluid px-4">
+            <h1 class="mt-4">Repair Booking</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="user-dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item active">Repair Booking</li>
+            </ol>
+        <div class="container-fluid px-4">
             <!-- Main Booking Form Section -->
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
+            <div class="row justify-content-center mt-2 mb-4" style="margin-top: -30px;">
+                <div class="col-lg-6 col-md-8 col-sm-10">
                     <div class="card border-0 shadow">
                         <div class="card-header bg-primary text-white">
                             <i class="fas fa-mobile-alt me-2"></i>
